@@ -3,6 +3,9 @@
 * Routes
 Testing routes
 ** Home route
-#+begin_src shell
- curl http://localhost:8080
+#+begin_src bash
+curl http://localhost:8080
 #+end_src
+
+#+RESULTS:
+: Hello World!
