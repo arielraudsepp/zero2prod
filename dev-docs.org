@@ -4,7 +4,7 @@
 Testing routes
 ** Home route
 #+begin_src bash
-curl http://localhost:8080
+curl http://localhost:50051
 #+end_src
 
 #+RESULTS:
