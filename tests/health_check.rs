@@ -1,12 +1,10 @@
 //! tests/health_check.rs
-use std::fmt::format;
-
-use actix_rt::net::TcpListener;
+use std::net::TcpListener;
 use reqwest;
 
 #[actix_rt::test]
 async fn health_check_works() {
-    let address = spawn_app();
+    let address: String = spawn_app();
     let client = reqwest::Client::new();
     let response = client
         .get(&format!("{}/health_check", &address))
