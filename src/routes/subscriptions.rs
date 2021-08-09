@@ -1,7 +1,5 @@
 //! src/routes/subscriptions.rs
-use actix_web::{App, HttpServer, HttpResponse, web};
-use actix_web::dev::Server;
-use std::net::TcpListener;
+use actix_web::{HttpResponse, web};
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
