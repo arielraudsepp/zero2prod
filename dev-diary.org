@@ -1,7 +1,0 @@
-#+TITLE: Dev Diary
-
-* Postgres
-- Postgres is run on Docker
-- "scripts/init_db.sh" contains the settings for Postgres and commands to launch the Docker image
-- run "./scripts/init_db.sh" to launch Postgres
-- can confirm image is running with command "docker ps"

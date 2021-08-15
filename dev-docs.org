@@ -1,11 +1,47 @@
 #+TITLE: Dev Docs
+* Diary
+** Postgres
+- Postgres is run on Docker
+- "scripts/init_db.sh" contains the settings for Postgres and commands to launch the Docker image
+** Caching dev dependencies
+"cargo-chef" causes memory overload when building on Digital ocean
+"cargo-build-deps" worked
+** Deploying application - database
+- in the main source file the db connection pool tries to connect immediately to the db
+- the db has not been configured yet and producing a PoolTimeOut error
+- changed from using "connect_with" to "connect_lazy_with" to enable deploying the app
+  prior to the database being ready
 
-* Routes
-Testing routes
-** Home route
-#+begin_src bash
-curl http://localhost:50051
+* Docs
+** Postgres
+- make executable with
+#+begin_src shell
+cmod +x ./scripts/init_db.sh
 #+end_src
 
-#+RESULTS:
-: Hello World!
+
+- run ~init_db~ to launch Postgres
+#+begin_src shell
+./scripts/init_db.sh > /dev/null
+#+end_src
+
+- if you want to restart the database
+
+#+begin_src shell
+docker kill $(docker ps -q)
+./scripts/init_db.sh > /dev/null
+#+end_src
+
+- can confirm image is running with command
+
+#+begin_src shell
+docker ps
+#+end_src
+
+
+** Routes
+Testing routes
+*** Health Check
+#+begin_src shell :results code
+curl --verbose http://127.0.0.1:8000/health_check 2>&1
+#+END_SRC
