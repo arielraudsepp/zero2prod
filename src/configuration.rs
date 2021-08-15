@@ -1,8 +1,8 @@
 //! src/configuration.rs
-use std::convert::{TryFrom, TryInto};
 use serde_aux::field_attributes::deserialize_number_from_string;
 use sqlx::postgres::PgConnectOptions;
 use sqlx::postgres::PgSslMode;
+use std::convert::{TryFrom, TryInto};
 
 #[derive(serde::Deserialize)]
 pub struct Settings {
@@ -11,7 +11,7 @@ pub struct Settings {
 }
 
 #[derive(serde::Deserialize)]
-pub struct ApplicationSettings{
+pub struct ApplicationSettings {
     #[serde(deserialize_with = "deserialize_number_from_string")]
     pub port: u16,
     pub host: String,
@@ -39,7 +39,9 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
         .try_into()
         .expect("Failed to parse APP_ENVIRONMENT");
     // Add env specific values
-    settings.merge(config::File::from(configuration_directory.join(environment.as_str())).required(true))?;
+    settings.merge(
+        config::File::from(configuration_directory.join(environment.as_str())).required(true),
+    )?;
     // Add setting from env variables
     settings.merge(config::Environment::with_prefix("app").separator("__"))?;
     settings.try_into()
@@ -66,7 +68,10 @@ impl TryFrom<String> for Environment {
         match s.to_lowercase().as_str() {
             "local" => Ok(Self::Local),
             "production" => Ok(Self::Production),
-            other => Err(format!("{} is not a supported environment. Use either 'local' or 'production'.", other)),
+            other => Err(format!(
+                "{} is not a supported environment. Use either 'local' or 'production'.",
+                other
+            )),
         }
     }
 }
