@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
         configuration.database.port
     );
     let connection_pool = PgPoolOptions::new()
-        .connect_timeout(std::time::Duration::from_secs(300))
+        .connect_timeout(std::time::Duration::from_secs(2))
         .connect_with(configuration.database.with_db())
         .await
         .expect("Failed to connect to Postgres.");
