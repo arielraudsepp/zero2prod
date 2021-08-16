@@ -6,11 +6,12 @@
 ** Caching dev dependencies
 "cargo-chef" causes memory overload when building on Digital ocean
 "cargo-build-deps" worked
-** Deploying application - database
+** Deploying
+*** application on Docker
 - in the main source file the db connection pool tries to connect immediately to the db
-- the db has not been configured yet and producing a PoolTimeOut error
-- changed from using "connect_with" to "connect_lazy_with" to enable deploying the app
-  prior to the database being ready
+- the db is not accessible by the app container and therefore panics
+*** Deploying application on Digital Ocean
+- the spec files from the book do not include the database on initial deployment. without connection to the database (as specified in main.rs), it will panic and fail to deploy
 
 * Docs
 ** Postgres
@@ -38,6 +39,16 @@ docker kill $(docker ps -q)
 docker ps
 #+end_src
 
+** App on Docker
+- build image
+  #+begin_src shell
+  docker build --tag zero2prod --file Dockerfile .
+  #+end_src
+
+- launch app
+  #+begin_src shell
+  docker run -p 8000:8000 zero2prod
+  #+end_src
 
 ** Routes
 Testing routes
