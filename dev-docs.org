@@ -39,6 +39,13 @@ docker kill $(docker ps -q)
 docker ps
 #+end_src
 
+- to make space on vm database
+
+#+begin_src shell
+docker kill ps
+docker system prune
+#+end_src
+
 ** App on Docker
 - build image
   #+begin_src shell
