@@ -1,8 +1,8 @@
 //! src/domain/new_subscriber.rs
 
-use crate::domain::subscriber_name::SubscriberName;
+use crate::domain::{SubscriberName, SubscriberEmail};
 
 pub struct NewSubscriber {
-    pub email: String,
+    pub email: SubscriberEmail,
     pub name: SubscriberName,
 }
