@@ -16,17 +16,17 @@ impl SubscriberEmail {
 }
 
 impl AsRef<str> for SubscriberEmail {
-    fn as_ref (&self) -> &str {
+    fn as_ref(&self) -> &str {
         &self.0
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use fake::faker::internet::en::SafeEmail;
-    use fake::Fake;
     use super::SubscriberEmail;
     use claim::assert_err;
+    use fake::faker::internet::en::SafeEmail;
+    use fake::Fake;
 
     #[test]
     fn empty_string_is_rejected() {
@@ -59,6 +59,5 @@ mod tests {
     fn valid_emails_are_parsed_successfully(valid_email: ValidEmailFixture) -> bool {
         dbg!(&valid_email.0);
         SubscriberEmail::parse(valid_email.0).is_ok()
-
     }
 }

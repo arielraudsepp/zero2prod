@@ -1,12 +1,12 @@
 //! src/routes/subscriptions.rs
 #![allow(clippy::async_yields_async)]
+use crate::domain::{NewSubscriber, SubscriberEmail, SubscriberName};
 use actix_web::{web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
+use std::convert::TryInto;
 use unicode_segmentation::UnicodeSegmentation;
 use uuid::Uuid;
-use crate::domain::{NewSubscriber, SubscriberName, SubscriberEmail};
-use std::convert::TryInto;
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -19,7 +19,8 @@ pub struct FormData {
     skip(new_subscriber, pool)
 )]
 pub async fn insert_subscriber(
-    pool: &PgPool, new_subscriber: &NewSubscriber
+    pool: &PgPool,
+    new_subscriber: &NewSubscriber,
 ) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
@@ -46,7 +47,7 @@ impl TryInto<NewSubscriber> for FormData {
     fn try_into(self) -> Result<NewSubscriber, Self::Error> {
         let name = SubscriberName::parse(self.name)?;
         let email = SubscriberEmail::parse(self.email)?;
-        Ok(NewSubscriber {email, name})
+        Ok(NewSubscriber { email, name })
     }
 }
 
@@ -58,10 +59,7 @@ impl TryInto<NewSubscriber> for FormData {
         subscriber_name = %form.name
     )
 )]
-pub async fn subscribe(
-    form: web::Form<FormData>,
-    pool: web::Data<PgPool>,
-) -> HttpResponse {
+pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
     let new_subscriber = match form.0.try_into() {
         Ok(form) => form,
         Err(_) => return HttpResponse::BadRequest().finish(),
