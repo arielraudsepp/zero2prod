@@ -2,7 +2,6 @@
 
 use crate::helpers::spawn_app;
 
-
 #[actix_rt::test]
 async fn subscribe_returns_a_200_for_vaild_form_data() {
     let app = spawn_app().await;

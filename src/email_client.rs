@@ -11,8 +11,7 @@ pub struct EmailClient {
 }
 
 impl EmailClient {
-    pub fn new(base_url: String, sender: SubscriberEmail, authorization_token: String
-    ) -> Self {
+    pub fn new(base_url: String, sender: SubscriberEmail, authorization_token: String) -> Self {
         let http_client = Client::builder()
             .timeout(std::time::Duration::from_secs(10))
             .build()
@@ -66,15 +65,15 @@ struct SendEmailRequest<'a> {
 mod tests {
     use crate::domain::SubscriberEmail;
     use crate::email_client::EmailClient;
+    use claim::assert_err;
+    use claim::assert_ok;
     use fake::faker::internet::en::SafeEmail;
     use fake::faker::lorem::en::{Paragraph, Sentence};
     use fake::{Fake, Faker};
+    use wiremock::matchers::any;
     use wiremock::matchers::{header, header_exists, method, path};
     use wiremock::Request;
     use wiremock::{Mock, MockServer, ResponseTemplate};
-    use wiremock::matchers::any;
-    use claim::assert_ok;
-    use claim::assert_err;
 
     struct SendEmailBodyMatcher;
 
@@ -130,7 +129,7 @@ mod tests {
             .await;
     }
 
-  #[tokio::test]
+    #[tokio::test]
     async fn send_email_suceeds_if_the_server_returns_200() {
         let mock_server = MockServer::start().await;
         let email_client = email_client(mock_server.uri());
@@ -171,8 +170,7 @@ mod tests {
         let mock_server = MockServer::start().await;
         let email_client = email_client(mock_server.uri());
 
-        let response = ResponseTemplate::new(200)
-            .set_delay(std::time::Duration::from_secs(180));
+        let response = ResponseTemplate::new(200).set_delay(std::time::Duration::from_secs(180));
         Mock::given(any())
             .respond_with(response)
             .expect(1)

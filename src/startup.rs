@@ -1,13 +1,13 @@
 //! src/startup.rs
-use sqlx::postgres::PgPoolOptions;
+use crate::configuration::{DatabaseSettings, Settings};
 use crate::email_client::EmailClient;
 use crate::routes::{health_check, subscribe};
 use actix_web::dev::Server;
 use actix_web::{web, App, HttpServer};
+use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
 use std::net::TcpListener;
 use tracing_actix_web::TracingLogger;
-use crate::configuration::{DatabaseSettings, Settings};
 
 pub struct Application {
     port: u16,
@@ -48,9 +48,7 @@ impl Application {
     }
 }
 
-pub async fn get_connection_pool(
-    configuration: &DatabaseSettings
-) -> Result<PgPool, sqlx::Error> {
+pub async fn get_connection_pool(configuration: &DatabaseSettings) -> Result<PgPool, sqlx::Error> {
     PgPoolOptions::new()
         .connect_timeout(std::time::Duration::from_secs(2))
         .connect_with(configuration.with_db())
