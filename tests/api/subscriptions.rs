@@ -5,7 +5,6 @@ use crate::helpers::spawn_app;
 #[actix_rt::test]
 async fn subscribe_returns_a_200_for_vaild_form_data() {
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
     let body = "name=le%20guin&email=ursula_le_guin%40gmail.com";
     let response = app.post_subscriptions(body.into()).await;
 
@@ -23,7 +22,6 @@ async fn subscribe_returns_a_200_for_vaild_form_data() {
 #[actix_rt::test]
 async fn subcribe_returns_a_400_when_data_is_missing() {
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=le%20guin", "missing the email"),
         ("email=ursula_le_guin%40gmail.com", "missing the name"),
@@ -31,7 +29,7 @@ async fn subcribe_returns_a_400_when_data_is_missing() {
     ];
 
     for (invalid_body, error_message) in test_cases {
-        let response = app.post_subscriptions(body.into()).await;
+        let response = app.post_subscriptions(invalid_body.into()).await;
 
         assert_eq!(
             400,
@@ -45,7 +43,6 @@ async fn subcribe_returns_a_400_when_data_is_missing() {
 #[actix_rt::test]
 async fn subscribe_returns_a_400_when_field_are_present_but_invalid() {
     let app = spawn_app().await;
-    let client = reqwest::Client::new();
     let test_cases = vec![
         ("name=&email=ursula+le_guin%40gmail.com", "empty name"),
         ("name=Ursula&email=", "empty email"),
