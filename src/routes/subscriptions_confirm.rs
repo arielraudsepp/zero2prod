@@ -4,7 +4,7 @@ use actix_web::{HttpResponse, web};
 
 #[derive(serde::Deserialize)]
 pub struct Parameters {
-    _subscriptions_token: String
+    subscription_token: String
 }
 
 #[tracing::instrument(
