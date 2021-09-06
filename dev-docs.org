@@ -1,5 +1,5 @@
 #+TITLE: Dev Docs
-* Diary
+* Notes
 ** Postgres
 - Postgres is run on Docker
 - "scripts/init_db.sh" contains the settings for Postgres and commands to launch the Docker image
@@ -12,7 +12,20 @@
 - the db is not accessible by the app container and therefore panics
 *** Deploying application on Digital Ocean
 - the spec files from the book do not include the database on initial deployment. without connection to the database (as specified in main.rs), it will panic and fail to deploy
-
+** Database Transactions
+- group related operations in a single unit of work
+- start with "BEGIN" and end with "COMMIT"
+- if any queries fail, the database rolls back
+- sqlx has dedicated API for transactions
+** Errors
+- enable caller to react (control flow)
+- need enough context about the failure to produce a report for an operator to troubleshoot
+- can be internal (ex. function calling another function within app) or at the edge (ex. API request that we failed to fulfill)
+* Diary
+** 05-09-2021
+- learned about importance of errors (control flow and providing info to user or operator)
+- internal or on the edge
+- implemented a test for database errors and examined the logs (using pretty printing)
 * Docs
 ** Postgres
 - make executable with
@@ -63,3 +76,9 @@ Testing routes
 #+begin_src shell :results code
 curl --verbose http://127.0.0.1:8000/health_check 2>&1
 #+END_SRC
+
+** OS Error 24 - "Too many open files"
+- increase the limit on maximum number of open file descriptors to 10000
+  #+begin_src shell
+  ulimit -n 10000
+  #+end_src

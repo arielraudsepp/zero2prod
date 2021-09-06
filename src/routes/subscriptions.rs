@@ -28,7 +28,6 @@ impl TryInto<NewSubscriber> for FormData {
     }
 }
 
-
 #[tracing::instrument(
     name = "Adding a new subscriber",
     skip(form, pool, email_client, base_url),
@@ -143,7 +142,6 @@ pub async fn insert_subscriber(
     })?;
     Ok(subscriber_id)
 }
-
 
 #[tracing::instrument(
     name = "Store subscription token in the database",
