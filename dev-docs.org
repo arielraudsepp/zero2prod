@@ -21,6 +21,14 @@
 - enable caller to react (control flow)
 - need enough context about the failure to produce a report for an operator to troubleshoot
 - can be internal (ex. function calling another function within app) or at the edge (ex. API request that we failed to fulfill)
+** Trait Objects
+- A trait object points to both an instance of a type implementing our specified trait as well as a table used to look up trait methods on that type at runtime
+- We create a trait object by specifying some sort of pointer, such as a & reference or a Box<T> smart pointer, then the dyn keyword, and then specifying the relevant trait.
+- can be used to invoke different implementations of the same interface
+- incur runtime cost (dynamic dispatch)
+** Option Type
+- optional value
+- is either Some (and contains a value) or None (does not contain a value)
 * Diary
 ** 05-09-2021
 - learned about importance of errors (control flow and providing info to user or operator)
@@ -38,6 +46,14 @@
     }" would produce an error
 }
 - orphan rule: cannot implement a foreign trait for a foreign type (foreign means another create). We must define a new type to wrap external type
+** 07-09-2021
+- learned about trait objects to access the underlying root cause of the current error without having to know info about the type of the error
+- can use match statements within enums for control flow -> behave differently based on the specific failure scenario
+* Feedback
+- In 8.2.1, when implementing StoreToken in the subscribe request handler, we change the return type for "HttpResponse" to "Result<HttpResponse, actix_web::Error>". This requires that the "error" case returned from new_subscriber, transaction, subscriber_id is changed from to return the correct type
+  "HttpResponse::InternalServerError().finish()"
+  to
+  "return Ok(HttpResponse::Internationalization().finish())"
 * Docs
 ** Postgres
 - make executable with
@@ -94,3 +110,7 @@ curl --verbose http://127.0.0.1:8000/health_check 2>&1
   #+begin_src shell
   ulimit -n 10000
   #+end_src
+** SQLX Logs with pretty printing
+export RUST_LOG="sqlx=error,info"
+export TEST_LOG=enabled
+cargo t {TEST_NAME OR KEYWORD} | bunyan
