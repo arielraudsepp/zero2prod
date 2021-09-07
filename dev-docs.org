@@ -26,6 +26,18 @@
 - learned about importance of errors (control flow and providing info to user or operator)
 - internal or on the edge
 - implemented a test for database errors and examined the logs (using pretty printing)
+** 06-09-2021
+- lines without semi-colons are expression who's value we want to return
+- example:
+  "fn plus_one(x: i32) -> i32 {
+    x + 1
+    }"
+    is correct because we want to return the value of "x + 1"
+  "fn plus_one(x: i32) -> i32 {
+    x + 1;
+    }" would produce an error
+}
+- orphan rule: cannot implement a foreign trait for a foreign type (foreign means another create). We must define a new type to wrap external type
 * Docs
 ** Postgres
 - make executable with
