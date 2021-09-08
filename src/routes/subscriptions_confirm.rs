@@ -1,4 +1,5 @@
 //! src/routes/subscriptions_confirm.rs
+#![allow(clippy::async_yields_async)]
 
 use actix_web::{web, HttpResponse};
 use sqlx::PgPool;
