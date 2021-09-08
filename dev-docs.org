@@ -47,8 +47,11 @@
 }
 - orphan rule: cannot implement a foreign trait for a foreign type (foreign means another create). We must define a new type to wrap external type
 ** 07-09-2021
-- learned about trait objects to access the underlying root cause of the current error without having to know info about the type of the error
+- learned about trait objects to access the underlying root cause of the current error without having to know info about the type of the error (invoke different implementations of the same interface) -> used standard library trait "Error" which provides different representations (Debug and Display) and source (underlying cause of error)
 - can use match statements within enums for control flow -> behave differently based on the specific failure scenario
+** 09-09-2021
+- implemented different enum variants depending on the type of database error, because the display message needs to be customized depending on whether it is a connection error, tracsaction error, etc.
+- implemented a derive macro (thiserror) to replace manual implementation of Display, source (root cause of error) and from (converting underlying errors into our own custom error type -> in thiserror, is also includes source so we don't have to specify that twice)
 * Feedback
 - In 8.2.1, when implementing StoreToken in the subscribe request handler, we change the return type for "HttpResponse" to "Result<HttpResponse, actix_web::Error>". This requires that the "error" case returned from new_subscriber, transaction, subscriber_id is changed from to return the correct type
   "HttpResponse::InternalServerError().finish()"
