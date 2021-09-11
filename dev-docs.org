@@ -57,9 +57,11 @@
 - reduce the responses to 400 and 500 (includes multiple error types such as sqlx::Error, StoreTokenError, reqwest::Error)
 - wrap dyn std::error::Error in Box because the size of the trait objects are not known at compile time (trait object stored on the heap, with pointer to heap location stored in enum state)
 ** 10-09-2021
-- switched from thiserror to anyhow
+- switched from thiserror to anyhow (we dont care about the error type the functions return)
 - anyhow works similar to thiserror but requires the error is Send, Sync and 'static, guarantees a backtrace is available, and represented by a narrow pointer
 - anyhow::context converts the error returned by our methods into a anyhow::Error and enriches with additional context around the intentions of the caller
+- scoped mocks produce a guard object (MockGuard) that has a custom drop implementation: when it goes out of scope, wiremock instructs the underlying MockServer to stop honoring the specified mock behaviour
+  - mock behaviour for test helper stays local to the test helper itself
 
 * Feedback
 - In 8.2.1, when implementing StoreToken in the subscribe request handler, we change the return type for "HttpResponse" to "Result<HttpResponse, actix_web::Error>". This requires that the "error" case returned from new_subscriber, transaction, subscriber_id is changed from to return the correct type
