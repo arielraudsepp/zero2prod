@@ -62,12 +62,17 @@
 - anyhow::context converts the error returned by our methods into a anyhow::Error and enriches with additional context around the intentions of the caller
 - scoped mocks produce a guard object (MockGuard) that has a custom drop implementation: when it goes out of scope, wiremock instructs the underlying MockServer to stop honoring the specified mock behaviour
   - mock behaviour for test helper stays local to the test helper itself
+- created newsletters route and test to confirm newsletters don't get sent to unconfirmed subscribers
 
 * Feedback
 - In 8.2.1, when implementing StoreToken in the subscribe request handler, we change the return type for "HttpResponse" to "Result<HttpResponse, actix_web::Error>". This requires that the "error" case returned from new_subscriber, transaction, subscriber_id is changed from to return the correct type
   "HttpResponse::InternalServerError().finish()"
   to
   "return Ok(HttpResponse::Internationalization().finish())"
+- In 9.2.3, adding the new handler "newsletters" has the wrong file header.
+  It currently says "//! src/routes/newsletters.rs"
+  should be
+  "//! src/startup.rs"
 * Docs
 ** Postgres
 - make executable with
