@@ -1,6 +1,6 @@
 //! src/routes/newsletters.rs
 use crate::{domain::SubscriberEmail, email_client::EmailClient, routes::error_chain_fmt};
-use actix_web::http::{StatusCode, HeaderValue, HeaderMap, header};
+use actix_web::http::{header, HeaderMap, HeaderValue, StatusCode};
 use actix_web::web;
 use actix_web::{HttpResponse, ResponseError};
 use anyhow::Context;
@@ -27,11 +27,8 @@ impl ResponseError for PublishError {
                 HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
             }
             PublishError::AuthError(_) => {
-                let mut response =
-                    HttpResponse::new(StatusCode::UNAUTHORIZED);
-                let header_value =
-                    HeaderValue::from_str(r#"Basic realm="publish""#)
-                    .unwrap();
+                let mut response = HttpResponse::new(StatusCode::UNAUTHORIZED);
+                let header_value = HeaderValue::from_str(r#"Basic realm="publish""#).unwrap();
                 response
                     .headers_mut()
                     .insert(header::WWW_AUTHENTICATE, header_value);
@@ -62,33 +59,32 @@ async fn get_confirmed_subscribers(
     Ok(confirmed_subscribers)
 }
 
-fn basic_authentication(headers: &HeaderMap) ->
-    Result<Credentials, anyhow::Error> {
-        let header_value = headers
-            .get("Authorization")
-            .context("The 'Authorization' header was missing")?
-            .to_str()
-            .context("The 'Authorization' header was not a valid UTF8 string")?;
-        let base64encoded_segment = header_value
-            .strip_prefix("Basic ")
-            .context("The authorization scheme was not 'Basic'")?;
-        let decoded_bytes = base64::decode_config(base64encoded_segment, base64::STANDARD)
-            .context("Failed to base64-decode 'Basic' credentials")?;
-        let decoded_credentials = String::from_utf8(decoded_bytes)
-            .context("The decoded credential string is not valid UTF8")?;
+fn basic_authentication(headers: &HeaderMap) -> Result<Credentials, anyhow::Error> {
+    let header_value = headers
+        .get("Authorization")
+        .context("The 'Authorization' header was missing")?
+        .to_str()
+        .context("The 'Authorization' header was not a valid UTF8 string")?;
+    let base64encoded_segment = header_value
+        .strip_prefix("Basic ")
+        .context("The authorization scheme was not 'Basic'")?;
+    let decoded_bytes = base64::decode_config(base64encoded_segment, base64::STANDARD)
+        .context("Failed to base64-decode 'Basic' credentials")?;
+    let decoded_credentials = String::from_utf8(decoded_bytes)
+        .context("The decoded credential string is not valid UTF8")?;
 
-        let mut credentials = decoded_credentials.splitn(2, ':');
-        let username = credentials
-            .next()
-            .ok_or_else(|| anyhow::anyhow!("A username must be provided in 'Basic' auth"))?
-            .to_string();
-        let password = credentials
-            .next()
-            .ok_or_else(|| anyhow::anyhow!("A password must be provided in 'Basic' auth"))?
-            .to_string();
+    let mut credentials = decoded_credentials.splitn(2, ':');
+    let username = credentials
+        .next()
+        .ok_or_else(|| anyhow::anyhow!("A username must be provided in 'Basic' auth"))?
+        .to_string();
+    let password = credentials
+        .next()
+        .ok_or_else(|| anyhow::anyhow!("A password must be provided in 'Basic' auth"))?
+        .to_string();
 
-        Ok(Credentials {username, password})
-    }
+    Ok(Credentials { username, password })
+}
 
 async fn validate_credentials(
     credentials: Credentials,
@@ -121,17 +117,10 @@ pub async fn publish_newsletter(
     email_client: web::Data<EmailClient>,
     request: web::HttpRequest,
 ) -> Result<HttpResponse, PublishError> {
-    let credentials = basic_authentication(request.headers())
-        .map_err(PublishError::AuthError)?;
-    tracing::Span::current().record(
-        "username",
-        &tracing::field::display(&credentials.username)
-    );
+    let credentials = basic_authentication(request.headers()).map_err(PublishError::AuthError)?;
+    tracing::Span::current().record("username", &tracing::field::display(&credentials.username));
     let user_id = validate_credentials(credentials, &pool).await?;
-    tracing::Span::current().record(
-        "user_id",
-        &tracing::field::display(&user_id)
-    );
+    tracing::Span::current().record("user_id", &tracing::field::display(&user_id));
     let subscribers = get_confirmed_subscribers(&pool).await?;
     for subscriber in subscribers {
         match subscriber {
