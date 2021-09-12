@@ -1,5 +1,7 @@
 //! tests/api/helpers.rs
 
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordHasher};
 use once_cell::sync::Lazy;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
@@ -7,13 +9,11 @@ use wiremock::MockServer;
 use zero2prod::configuration::{get_configuration, DatabaseSettings};
 use zero2prod::startup::{get_connection_pool, Application};
 use zero2prod::telemetry::{get_subscriber, init_subscriber};
-use argon2::password_hash::SaltString;
-use argon2::{Argon2, PasswordHasher};
 
 pub struct TestUser {
     pub user_id: Uuid,
     pub username: String,
-    pub password: String
+    pub password: String,
 }
 
 impl TestUser {
@@ -21,7 +21,7 @@ impl TestUser {
         Self {
             user_id: Uuid::new_v4(),
             username: Uuid::new_v4().to_string(),
-            password: Uuid::new_v4().to_string()
+            password: Uuid::new_v4().to_string(),
         }
     }
 
@@ -66,7 +66,7 @@ pub struct TestApp {
     pub db_pool: PgPool,
     pub email_server: MockServer,
     pub port: u16,
-    test_user: TestUser
+    test_user: TestUser,
 }
 
 impl TestApp {
@@ -138,12 +138,11 @@ pub async fn spawn_app() -> TestApp {
             .await
             .expect("Failed to connect to the database"),
         email_server,
-        test_user: TestUser::generate()
+        test_user: TestUser::generate(),
     };
     test_app.test_user.store(&test_app.db_pool).await;
     test_app
 }
-
 
 async fn configure_database(config: &DatabaseSettings) -> PgPool {
     //Create database
