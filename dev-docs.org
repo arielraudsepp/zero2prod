@@ -70,9 +70,9 @@
   to
   "return Ok(HttpResponse::Internationalization().finish())"
 - In 9.2.3, adding the new handler "newsletters" has the wrong file header.
-  It currently says "//! src/routes/newsletters.rs"
-  should be
-  "//! src/startup.rs"
+  It currently says "//! src/routes/newsletters.rs". It should be "//! src/startup.rs"
+- In 9.5.1, adding the new helper function post_newsletters into the newsletter tests has the wrong file header.
+  It currently says "//! tests/api/helpers" It should be "//! tests/api/newsletters"
 * Docs
 ** Postgres
 - make executable with

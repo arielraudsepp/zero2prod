@@ -5,6 +5,7 @@ use crate::email_client::EmailClient;
 use crate::startup::ApplicationBaseUrl;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse, ResponseError};
+use anyhow::Context;
 use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
@@ -12,7 +13,6 @@ use sqlx::{PgPool, Postgres, Transaction};
 use std::convert::TryInto;
 use unicode_segmentation::UnicodeSegmentation;
 use uuid::Uuid;
-use anyhow::Context;
 
 #[derive(serde::Deserialize)]
 pub struct FormData {
@@ -45,8 +45,7 @@ pub async fn subscribe(
     email_client: web::Data<EmailClient>,
     base_url: web::Data<ApplicationBaseUrl>,
 ) -> Result<HttpResponse, SubscribeError> {
-    let new_subscriber = form.0.try_into()
-                               .map_err(SubscribeError::ValidationError)?;
+    let new_subscriber = form.0.try_into().map_err(SubscribeError::ValidationError)?;
     let mut transaction = pool
         .begin()
         .await
@@ -72,9 +71,9 @@ pub async fn subscribe(
         new_subscriber,
         &base_url.0,
         &subscription_token,
-        )
-        .await
-        .context("Failed to send a confirmation email.")?;
+    )
+    .await
+    .context("Failed to send a confirmation email.")?;
 
     Ok(HttpResponse::Ok().finish())
 }

@@ -1,10 +1,10 @@
 //! src/routes/newsletters.rs
-use actix_web::{HttpResponse, ResponseError};
-use actix_web::web;
-use sqlx::PgPool;
 use crate::{domain::SubscriberEmail, email_client::EmailClient, routes::error_chain_fmt};
 use actix_web::http::StatusCode;
+use actix_web::web;
+use actix_web::{HttpResponse, ResponseError};
 use anyhow::Context;
+use sqlx::PgPool;
 
 #[derive(thiserror::Error)]
 pub enum PublishError {
@@ -13,8 +13,7 @@ pub enum PublishError {
 }
 
 impl std::fmt::Debug for PublishError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>
-    ) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         error_chain_fmt(self, f)
     }
 }
@@ -22,8 +21,7 @@ impl std::fmt::Debug for PublishError {
 impl ResponseError for PublishError {
     fn status_code(&self) -> StatusCode {
         match self {
-            &PublishError::UnexpectedError(_) =>
-                StatusCode::INTERNAL_SERVER_ERROR,
+            PublishError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -32,34 +30,27 @@ struct ConfirmedSubscriber {
     email: SubscriberEmail,
 }
 
-#[tracing::instrument(name = "Adding a new subscriber",
-skip(pool))]
+#[tracing::instrument(name = "Adding a new subscriber", skip(pool))]
 async fn get_confirmed_subscribers(
-    pool:&PgPool,
+    pool: &PgPool,
 ) -> Result<Vec<Result<ConfirmedSubscriber, anyhow::Error>>, anyhow::Error> {
-    struct Row {
-        email: String,
-    }
-    let rows = sqlx::query_as!(
-        Row,
-        r#"SELECT email FROM subscriptions WHERE status = 'confirmed'"#,
-    )
-    .fetch_all(pool)
-    .await?;
-    let confirmed_subscribers = rows
-        .into_iter()
-        .map(|r| match SubscriberEmail::parse(r.email) {
-            Ok(email) => Ok(ConfirmedSubscriber {email}),
-            Err(error) => Err(anyhow::anyhow!(error)),
-        })
-        .collect();
+    let confirmed_subscribers =
+        sqlx::query!(r#"SELECT email FROM subscriptions WHERE status = 'confirmed'"#,)
+            .fetch_all(pool)
+            .await?
+            .into_iter()
+            .map(|r| match SubscriberEmail::parse(r.email) {
+                Ok(email) => Ok(ConfirmedSubscriber { email }),
+                Err(error) => Err(anyhow::anyhow!(error)),
+            })
+            .collect();
     Ok(confirmed_subscribers)
 }
 
 pub async fn publish_newsletter(
     body: web::Json<BodyData>,
     pool: web::Data<PgPool>,
-    email_client: web::Data<EmailClient>
+    email_client: web::Data<EmailClient>,
 ) -> Result<HttpResponse, PublishError> {
     let subscribers = get_confirmed_subscribers(&pool).await?;
     for subscriber in subscribers {
@@ -74,10 +65,7 @@ pub async fn publish_newsletter(
                     )
                     .await
                     .with_context(|| {
-                        format!(
-                            "Failed to send newsletter issue to {}",
-                            subscriber.email
-                        )
+                        format!("Failed to send newsletter issue to {}", subscriber.email)
                     })?;
             }
             Err(error) => {
@@ -95,11 +83,11 @@ pub async fn publish_newsletter(
 #[derive(serde::Deserialize)]
 pub struct BodyData {
     title: String,
-    content: Content
+    content: Content,
 }
 
 #[derive(serde::Deserialize)]
 pub struct Content {
     html: String,
-    text: String
+    text: String,
 }
