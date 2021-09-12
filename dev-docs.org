@@ -66,6 +66,8 @@
 ** 12-09-2021
 - API security: authentication(who) and authorization
 - extracting username and password from the incoming request - building our own using base64-encoding and authentication response header
+- store username and password in the database and confirm they are correct when posting
+- added cryptographic hash function SHA-3 for password
 
 * Feedback
 - In 8.2.1, when implementing StoreToken in the subscribe request handler, we change the return type for "HttpResponse" to "Result<HttpResponse, actix_web::Error>". This requires that the "error" case returned from new_subscriber, transaction, subscriber_id is changed from to return the correct type
