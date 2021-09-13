@@ -72,6 +72,7 @@
 - salting: adding a unique random string to the beginning of the user password before generating the hash
 - PHC string format: provides a standard representation for password hash in case we need to change hashing algorithms at some point (use something other than Argon2id)
 - off load CPU-intensive tasks to a separate threadpool so they are not interfering with the scheduling of the async tasks
+- prevent user enumeration vulnerability (if an attacker knows at least one valid username, they can inspect the server response times to confirm if another username exists) by removing the timing diff between auth failure due to an invalid password and a non-existent username
 
 * Feedback
 - In 8.2.1, when implementing StoreToken in the subscribe request handler, we change the return type for "HttpResponse" to "Result<HttpResponse, actix_web::Error>". This requires that the "error" case returned from new_subscriber, transaction, subscriber_id is changed from to return the correct type
